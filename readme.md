@@ -14,6 +14,6 @@ Quote from [Screening(s)](http://screencanadianelit.ca):
 
 ## Built With
 
-* [jQuery](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Drupal](https://maven.apache.org/) - Dependency Management
+* [jQuery](https://jquery.com/)
+* [Drupal](https://www.drupal.org/)
 
