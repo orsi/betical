@@ -4,7 +4,7 @@ A born-digital paragraph generator composed with remixed typed assemblage-letter
 
 ## About
 
-Quote from [Screening(s)](http://screencanadianelit.ca/betical/):
+Quote from [Screening(s)](http://screencanadianelit.ca):
 
 > “Betical” is a born-digital paragraph generator; concept and art by Dani Spinosa, programming by Jon Orsi.
 >
