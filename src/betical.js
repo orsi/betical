@@ -54,23 +54,8 @@ class Betical extends HTMLElement {
       <section class="poem">
     `;
     const poem = this.createPoem(5, 15);
-    for (const paragraph of poem) {
-      html += '<p>';
-      for (const word of paragraph) {
-        html += '<span class="word">';
-        for (const letter of word) {
-          html += this.getImgForLetter(letter, 'display: inline-block; width: 24px; margin-bottom: 4px; box-sizing: border-box;');
-        }
-        html += '</span>';
-      }
-      html += '</p>';
-    }
-    html += `</section>`;
+    html += this.getPoemHtml(poem, '');
     this.shadowRoot.innerHTML = html;
-  }
-
-  getImgForLetter(letter, styles) {
-    return `<img src="${base64Letters[letter]}" style="${styles}" />`;
   }
 
   createPoem(min, max) {
@@ -92,6 +77,7 @@ class Betical extends HTMLElement {
     }
     return paragraph;
   }
+
   createWord(min, max) {
     var word = [];
     var length = Math.floor(Math.random() * (max - min)) + min;
@@ -102,6 +88,36 @@ class Betical extends HTMLElement {
     return word;
   }
 
-}
+  getPoemHtml(poem, styles) {
+    let html = `<section class="poem" styles="${styles}">`;
+    for (const paragraph of poem) {
+      html += this.getParagraphHtml(paragraph, '');
+    }
+    html += '</section>';
+    return html;
+  }
 
+  getParagraphHtml(paragraph, styles) {
+    let html = `<p class="paragraph" styles="${styles}">`;
+    for (const word of paragraph) {
+      html += this.getWordHtml(word, '');
+    }
+    html += '</p>';
+    return html;
+  }
+
+  getWordHtml(word, styles) {
+    let html = `<span class="word" style="${styles}">`;
+    for (const letter of word) {
+      html += this.getLetterHtml(letter, 'display: inline-block; width: 24px; margin-bottom: 4px; box-sizing: border-box;');
+    }
+    html += '</span>';
+    return html;
+  }
+
+  getLetterHtml(letter, styles) {
+    return `<img src="${base64Letters[letter]}" style="${styles}" />`;
+  }
+
+}
 window.customElements.define('bet-ical', Betical);
