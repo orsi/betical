@@ -1,4 +1,14 @@
 import base64Letters from './letters.js';
+const audioService = {
+  newLine: new Audio('./new-line.mp3'),
+  type: [
+    new Audio('./type-1.mp3'),
+    new Audio('./type-2.mp3'),
+    new Audio('./type-3.mp3'),
+    new Audio('./type-4.mp3'),
+    new Audio('./type-5.mp3')
+  ]
+};
 
 const componentStyles = `
   :host {
