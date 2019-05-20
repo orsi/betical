@@ -1,3 +1,5 @@
+import base64Letters from './letters.js';
+
 const componentStyles = `
   :host {
     display: block;
@@ -10,12 +12,12 @@ const componentStyles = `
     text-align: center;
     font-weight: 300;
   }
-  .poetry-container {
-    margin: 0 auto;
-    max-width: 600px;
-  }
   p {
     margin-bottom: 48px;
+  }
+  .poem {
+    margin: 0 auto;
+    max-width: 600px;
   }
   .word {
     display: inline-block;
@@ -23,22 +25,13 @@ const componentStyles = `
   }
 `;
 class Betical extends HTMLElement {
-  base64Images;
-  letters = [];
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
-    // load image
-    this.base64Images = fetch('./images.json')
-      .then(response => response.json());
   }
 
   connectedCallback() {
-    this.base64Images
-      .then(data => {
-        this.letters = data.images;
-        this.render();
-      });
+    this.render();
   }
 
   render() {
@@ -48,7 +41,7 @@ class Betical extends HTMLElement {
         ${componentStyles}
       </style>
       <h1>Betical</h1>
-      <section class="poetry-container">
+      <section class="poem">
     `;
     const poem = this.createPoem(5, 15);
     for (const paragraph of poem) {
@@ -67,7 +60,7 @@ class Betical extends HTMLElement {
   }
 
   getImgForLetter(letter, styles) {
-    return `<img src="${this.letters[letter]}" style="${styles}" />`;
+    return `<img src="${base64Letters[letter]}" style="${styles}" />`;
   }
 
   createPoem(min, max) {
@@ -93,7 +86,7 @@ class Betical extends HTMLElement {
     var word = [];
     var length = Math.floor(Math.random() * (max - min)) + min;
     for (var i = 0; i < length; i++) {
-      var letterIndex = Math.floor(Math.random() * this.letters.length);
+      var letterIndex = Math.floor(Math.random() * base64Letters.length);
       word.push(letterIndex);
     }
     return word;
