@@ -67,7 +67,7 @@ class Betical extends HTMLElement {
   }
 
   getImgForLetter(letter, styles) {
-    return `<img src="${letter}" style="${styles}" />`;
+    return `<img src="${this.letters[letter]}" style="${styles}" />`;
   }
 
   createPoem(min, max) {
@@ -94,7 +94,7 @@ class Betical extends HTMLElement {
     var length = Math.floor(Math.random() * (max - min)) + min;
     for (var i = 0; i < length; i++) {
       var letterIndex = Math.floor(Math.random() * this.letters.length);
-      word.push(this.letters[letterIndex]);
+      word.push(letterIndex);
     }
     return word;
   }
