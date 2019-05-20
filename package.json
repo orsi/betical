@@ -4,7 +4,8 @@
   "description": "A born-digital paragraph generator composed with remixed typed assemblage-letters.",
   "main": "betical.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "serve": "http-server src"
   },
   "repository": {
     "type": "git",
@@ -16,5 +17,9 @@
   "bugs": {
     "url": "https://github.com/jorsi/betical/issues"
   },
-  "homepage": "https://github.com/jorsi/betical#readme"
+  "homepage": "https://github.com/jorsi/betical#readme",
+  "devDependencies": {
+    "base64-img": "^1.0.4",
+    "http-server": "^0.11.1"
+  }
 }
