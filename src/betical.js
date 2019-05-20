@@ -1,6 +1,30 @@
-
+const componentStyles = `
+  :host {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background-color: #fafafa;
+  }
+  h1 {
+    font-family: serif;
+    text-align: center;
+    font-weight: 300;
+  }
+  .poetry-container {
+    margin: 0 auto;
+    max-width: 600px;
+  }
+  p {
+    margin-bottom: 48px;
+  }
+  .word {
+    display: inline-block;
+    margin-right: 16px;
+  }
+`;
 class Betical extends HTMLElement {
   base64Images;
+  letters = [];
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
@@ -12,57 +36,69 @@ class Betical extends HTMLElement {
   connectedCallback() {
     this.base64Images
       .then(data => {
-        this.render(data.images);
+        this.letters = data.images;
+        this.render();
       });
   }
 
-  render(types) {
-    for (const type of types) {
-      this.shadowRoot.innerHTML +=
-        `<img src="${type}" width="10" height="10">`;
+  render() {
+    let html = '';
+    html += `
+      <style>
+        ${componentStyles}
+      </style>
+      <h1>Betical</h1>
+      <section class="poetry-container">
+    `;
+    const poem = this.createPoem(5, 15);
+    for (const paragraph of poem) {
+      html += '<p>';
+      for (const word of paragraph) {
+        html += '<span class="word">';
+        for (const letter of word) {
+          html += this.getImgForLetter(letter, 'display: inline-block; width: 24px; margin-bottom: 4px; box-sizing: border-box;');
+        }
+        html += '</span>';
+      }
+      html += '</p>';
     }
+    html += `</section>`;
+    this.shadowRoot.innerHTML = html;
   }
 
-  createWord($minLetters, $maxLetters) {
-    var word = [];
-    // Sets the minimum and maximum amount of images to display
-    var min = $minLetters;
-    var max = $maxLetters;
-    // Calculates a random amount of images between min and max
-    var wordLength = Math.floor(Math.random() * (max - min)) + min;
-    // Repeat loop for the random amount of images picked above
-    for (var i = 0; i < wordLength; i++) {
-      // Select a random index out of the list of images
-      var randLetter = Math.floor(Math.random() * letterList.length);
-      // Set that random image to display
-    var randLetterWidth = Math.floor(Math.random() * 15) + 15;
-    var randLetterMargin = Math.floor(Math.random() * 3);
-      var letter = jQuery(letterList[randLetter]).clone().attr('style', 'max-width: ' + randLetterWidth + 'px; margin-right: ' + randLetterMargin + 'px');
-      word.push(letter);
-    }
-    var wordItem = jQuery(word);
-
-    // hack -- converts every li element into a string and then wraps it
-    var randWordMargin = Math.floor(Math.random() * 10) + 20;
-    var html = '<li style="margin-right: ' + randWordMargin + 'px"><ul class="word-letter-list">'
-    for (var j = 0; j < wordItem.length; j++) {
-      html += wordItem[j].prop('outerHTML');
-    }
-    html += '</ul></li>'
-
-    jQuery('#words').append(html);
+  getImgForLetter(letter, styles) {
+    return `<img src="${letter}" style="${styles}" />`;
   }
 
-  createParagraph($minWords, $maxWords, $minLetters, $maxLetters) {
-    var min = $minWords;
-    var max = $maxWords;
+  createPoem(min, max) {
+    const poem = [];
+    // Calculates a random amount of paragraphs between min and max
+    var length = Math.floor(Math.random() * (max - min)) + min;
+    for (var i = 0; i < length; i++) {
+      poem.push(this.createParagraph(5, 20));
+    }
+    return poem;
+  }
 
+  createParagraph(min, max) {
+    const paragraph = [];
     // Calculates a random amount of words between min and max
-    var paragraphLength = Math.floor(Math.random() * (max - min)) + min;
-    for (var i = 0; i < paragraphLength; i++) {
-      createWord($minLetters, $maxLetters);
+    var length = Math.floor(Math.random() * (max - min)) + min;
+    for (var i = 0; i < length; i++) {
+      paragraph.push(this.createWord(2, 12));
     }
+    return paragraph;
   }
+  createWord(min, max) {
+    var word = [];
+    var length = Math.floor(Math.random() * (max - min)) + min;
+    for (var i = 0; i < length; i++) {
+      var letterIndex = Math.floor(Math.random() * this.letters.length);
+      word.push(this.letters[letterIndex]);
+    }
+    return word;
+  }
+
 }
 
 window.customElements.define('bet-ical', Betical);
