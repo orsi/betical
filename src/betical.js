@@ -1,28 +1,40 @@
 import base64Letters from './letters.js';
 const audioSources = {
   newLine: './new-line.mp3',
+  space: './type-2.mp3',
   type: [
     './type-1.mp3',
-    './type-2.mp3',
     './type-3.mp3',
     './type-4.mp3',
-    './type-5.mp3'
+    './type-5.mp3',
   ]
 };
 
-const userInteractionEvents = [
-  'click',
-  'touchmove',
-  'focus'
-];
-
 class Betical extends HTMLElement {
-  hasUserInteracted = false;
+  debug = false;
+  title;
+  beticalContainer;
+  startButton;
+  stopButton;
+  resetButton;
   poem;
+  currentParagraphElement;
   currentParagraphIndex = 0;
+  currentWordElement;
   currentWordIndex = 0;
   currentLetterIndex = 0;
-  beticalContainer;
+  running = false;
+  minLetterDelay = 200;
+  maxLetterDelay = 500;
+  lastTypeSound = -1;
+  letterWidth = 20;
+  letterHeight = 20;
+  lastFrameTime = new Date().getTime();
+  accumulator = 0;
+  fps = 60;
+  frameRate = 1000 / this.fps;
+  sinceLastUpdate = 0;
+
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
@@ -31,17 +43,36 @@ class Betical extends HTMLElement {
 
   connectedCallback() {
     this.render();
-    this.beticalContainer = document.querySelector('.betical-container');
+    this.title = this.shadowRoot.querySelector('#betical-title');
+    this.hint = this.shadowRoot.querySelector('#hint');
+    this.startButton = this.shadowRoot.querySelector('#betical-start');
+    this.stopButton = this.shadowRoot.querySelector('#betical-stop');
+    this.resetButton = this.shadowRoot.querySelector('#betical-reset');
+    this.beticalContainer = this.shadowRoot.querySelector('#betical-container');
 
-    // user must interact with page before sound will play
-    userInteractionEvents.forEach((eventName)=>{
-      window.addEventListener(eventName, () => {
-        if(!this.hasUserInteracted){
-          this.hasUserInteracted = true;
+    // setup first paragraph/word
+    this.currentParagraphElement = this.createParagraphElement(this.beticalContainer);
+    this.currentWordElement = this.createWordElement(this.currentParagraphElement);
+
+    // attach events
+    if (this.debug) {
+      this.startButton.addEventListener('click', () => {
+        this.start();
+      });
+      this.stopButton.addEventListener('click', () => {
+        this.stop();
+      });
+      this.resetButton.addEventListener('click', () => {
+        this.reset();
+      });
+    } else {
+      window.addEventListener('click', () => {
+        if (!this.running) {
           this.start();
+          this.hint.style.opacity = 0;
         }
       });
-    });
+    }
   }
 
   render() {
@@ -50,10 +81,30 @@ class Betical extends HTMLElement {
     :host {
       display: block;
       padding: 36px;
+      height: 100%;
+      width: 100%;
+      box-sizing: border-box;
+      background-color: #f5f5f5;
     }
-
-    .betical-button {
-      display: block;
+    #betical-title {
+      font-family: sans-serif;
+      font-weight: 300;
+      text-transform: uppercase;
+      color: rgba(0,0,0,.2);
+    }
+    #hint {
+      font-size: 14px;
+      font-weight: 900;
+      margin-left: 24px;
+      transition: opacity .6s ease-in;
+    }
+    .debug {
+      ${this.debug ? 'display: block;' : 'display: none;'}
+    }
+    #betical-start,
+    #betical-stop,
+    #betical-reset {
+      display: inline-block;
       margin: 0 auto 36px auto;
       width: 300px;
       height: 80px;
@@ -63,76 +114,123 @@ class Betical extends HTMLElement {
       background: none;
       cursor: pointer;
     }
-
-    .betical-container {
-
+    #betical-container {
     }
-
     .paragraph {
+      position: relative;
       margin-bottom: 48px;
-    }
-    .poem {
-      margin: 0 auto;
-      max-width: 600px;
+      white-space: pre-line;
     }
     .word {
+      position: relative;
+      height: 24px;
+      display: inline;
+      vertical-align: top;
+    }
+    .letter {
+      position: relative;
       display: inline-block;
-      margin-right: 16px;
     }
     </style>
-    <button class="betical-button">Betical</button>
-    <section class="betical-container"></section>
+    <h1 id="betical-title">
+      Betical
+      <span id="hint">Click to start</span>
+    </h1>
+    <div class="debug">
+      <button id="betical-start">Start</button>
+      <button id="betical-stop">Stop</button>
+      <button id="betical-reset">Reset</button>
+    </div>
+    <section id="betical-container"></section>
   `;
   }
 
   start() {
-    console.log(this);
-    if (!this.hasUserInteracted) {
-      // try to play audio to see if user has interacted
-      // with the page yet
-      const audioPromise = audioSources.newLine.play();
-      if (audioPromise) {
-        audioPromise.catch((error) => {
-          setTimeout(() => this.start(), 500);
-        });
-      }
-    } else {
-      this.running = true;
-      this.typePoem();
-    }
+    this.running = true;
+
+    // reset last update to avoid catch up on resume
+    this.lastFrameTime = new Date().getTime();
+
+    this.run();
   }
+
   stop() {
     this.running = false;
   }
 
-  typePoem() {
-    let nextLetter;
-    if (this.poem[this.currentParagraphIndex]) {
-      if (this.poem[this.currentParagraphIndex][this.currentWordIndex]) {
-        nextLetter =this.poem[this.currentParagraphIndex][this.currentWordIndex][this.currentLetterIndex];
-        if (nextLetter) {
-          this.typeLetter(this.shadowRoot, nextLetter);
-          this.currentLetterIndex++;
-        } else {
-          // end of word
-          this.currentLetterIndex = 0;
-          this.currentWordIndex++;
-          this.typeSpace(this.shadowRoot);
-        }
-      } else {
-        // end of paraphs
-        this.currentWordIndex = 0;
-        this.currentParagraphIndex++;
-        this.typeNewLine(this.shadowRoot);
-      }
-    } else {
-      // no more paragraphis, no more poem
-      this.stop();
+  reset() {
+    this.currentParagraphIndex = 0;
+    this.currentWordIndex = 0;
+    this.currentLetterIndex = 0;
+    this.nextUpdateIn = 0;
+    this.beticalContainer.innerHTML = '';
+    // setup first paragraph/word
+    this.currentParagraphElement = this.createParagraphElement(this.beticalContainer);
+    this.currentWordElement = this.createWordElement(this.currentParagraphElement);
+  }
+
+
+  run() {
+    const now = new Date().getTime();
+    const delta = now - this.lastFrameTime;
+    this.lastFrameTime = now;
+
+    this.accumulator += delta;
+    while (this.accumulator >= this.frameRate) {
+      this.update(this.frameRate);
+      this.accumulator -= this.frameRate;
     }
 
     if (this.running) {
-      const delay = (Math.random() * 200) + 300;
-      setTimeout(() => this.typePoem(), delay);
+      requestAnimationFrame(() => this.run());
+    }
+  }
+
+  nextUpdateIn = 0;
+  update (time) {
+    this.sinceLastUpdate += time;
+    let didUpdate = false;
+
+    if (this.sinceLastUpdate >= this.nextUpdateIn) {
+      if (this.poem[this.currentParagraphIndex]) {
+        // same paragraph
+
+        if (this.poem[this.currentParagraphIndex][this.currentWordIndex]) {
+          // same word
+
+          const nextLetter = this.poem[this.currentParagraphIndex][this.currentWordIndex][this.currentLetterIndex];
+          if (nextLetter) {
+            // new letter
+            didUpdate = true;
+            this.currentLetterIndex++;
+            this.createLetterElement(this.currentWordElement, nextLetter);
+            this.playTypeSound();
+          } else {
+            // no letters, end of word
+            didUpdate = true;
+            this.currentLetterIndex = 0;
+            this.currentWordIndex++;
+            this.currentWordElement = this.createWordElement(this.currentParagraphElement);
+            this.playSpaceSound();
+          }
+        } else {
+          // no words, end of paragraph
+          this.currentWordIndex = 0;
+          this.currentParagraphIndex++;
+          this.currentParagraphElement = this.createParagraphElement(this.beticalContainer);
+          this.playNewLineSound();
+        }
+      } else {
+        // no more paragraphs, no more poem
+        this.stop();
+        this.playNewLineSound();
+      }
+
+      if (didUpdate) {
+          // figure out next update
+          this.nextUpdateIn = Math.random() * (this.maxLetterDelay - this.minLetterDelay) + this.minLetterDelay;
+          this.sinceLastUpdate = 0;
+      }
     }
   }
 
@@ -166,63 +264,63 @@ class Betical extends HTMLElement {
     return word;
   }
 
-  createParagraphElement() {
+  createParagraphElement(container) {
     const paragraphElement = document.createElement('p');
     paragraphElement.className = 'paragraph';
+
+    // randomize styles
+    const marginBottom = Math.random() * 24 + 12;
+    paragraphElement.style.marginBottom = `${marginBottom}px`
+
+    container.append(paragraphElement);
     return paragraphElement;
   }
 
-  createWordElement() {
+  createWordElement(container) {
     const wordElement = document.createElement('span');
     wordElement.className = 'word';
+
+    // randomize styles
+    const marginRight = Math.random() * 12 + 10;
+    wordElement.style.marginRight = `${marginRight}px`
+
+    container.append(wordElement);
     return wordElement;
   }
 
-  createLetterElement(letter) {
+  createLetterElement(container, letter) {
     const imgElement = document.createElement('img');
+    imgElement.className = 'letter';
     imgElement.src = base64Letters[letter];
-    imgElement.style.width = '16px';
-    imgElement.style.height = '16px';
+
+    // randomize styles
+    const opacity = Math.random() * .4 + .6;
+    const top = Math.random() * 4;
+    imgElement.style.width = `${this.letterWidth}px`
+    imgElement.style.height = `${this.letterHeight}px`;
+    imgElement.style.opacity = `${opacity}`
+    imgElement.style.top = `${top}px`;
+
+    container.append(imgElement);
     return imgElement;
   }
 
-  playTypeSound() {
-    const rand = Math.floor(Math.random() * audioSources.type.length);
-    const src = audioSources.type[rand];
-    const audioPromise = new Audio(src).play();
-    if (audioPromise) {
-      audioPromise.catch(function(error) { console.error(error); });
-    }
-  }
 
   playNewLineSound() {
-    const src = audioSources.newLine;
-    const audioPromise = new Audio(src).play();
-    if (audioPromise) {
-      audioPromise.catch(function(error) { console.error(error); });
+    new Audio(audioSources.newLine).play();
+  }
+
+  playSpaceSound() {
+    new Audio(audioSources.space).play();
+  }
+  playTypeSound() {
+    let nextTypeSound = Math.floor(Math.random() * audioSources.type.length);
+    while (nextTypeSound === this.lastTypeSound) {
+      nextTypeSound = Math.floor(Math.random() * audioSources.type.length);
     }
-  }
-
-  typeLetter($wordContainer, letter) {
-    const letterHtml = this.createLetterElement(letter);
-    $wordContainer.append(letterHtml);
-    this.playTypeSound();
-  }
-
-  typeSpace($wordContainer) {
-    const spanElement = document.createElement('span');
-    spanElement.style.display = 'inline-block';
-    spanElement.style.width = '16px'
-    $wordContainer.append(spanElement);
-    // this.playSpaceSound();
-  }
-
-  typeNewLine($wordContainer) {
-    let brElement = document.createElement('br');
-    $wordContainer.append(brElement);
-    brElement = document.createElement('br');
-    $wordContainer.append(brElement);
-    this.playNewLineSound();
+    this.lastTypeSound = nextTypeSound;
+    const src = audioSources.type[nextTypeSound];
+    new Audio(src).play();
   }
 }
 window.customElements.define('bet-ical', Betical);
