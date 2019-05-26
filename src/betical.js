@@ -1,10 +1,10 @@
 import base64Letters from './letters.js';
-import newLineSound from './assets/new-line.mp3';
-import spaceSound from './assets/type-2.mp3';
-import typeSound1 from './assets/type-1.mp3';
-import typeSound2 from './assets/type-3.mp3';
-import typeSound3 from './assets/type-4.mp3';
-import typeSound4 from './assets/type-5.mp3';
+import newLineSound from './new-line.mp3';
+import spaceSound from './type-2.mp3';
+import typeSound1 from './type-1.mp3';
+import typeSound2 from './type-3.mp3';
+import typeSound3 from './type-4.mp3';
+import typeSound4 from './type-5.mp3';
 
 export class Betical extends HTMLElement {
   constructor() {

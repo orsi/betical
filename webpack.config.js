@@ -22,9 +22,9 @@ module.exports = {
           test: /\.(mp3)$/,
           use: [
             {
-              loader: 'file-loader',
-              options: {},
-            },
+              loader: 'url-loader',
+              options: {}
+            }
           ],
         },
       ],
@@ -34,7 +34,7 @@ module.exports = {
   },
   devtool: 'source-map',
   devServer: {
-    contentBase: path.join(__dirname, 'src'),
+    contentBase: path.join(__dirname, 'dist'),
     compress: true,
     port: 9000
   },
