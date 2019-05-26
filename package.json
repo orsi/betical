@@ -2,7 +2,7 @@
   "name": "betical",
   "version": "1.0.0",
   "description": "A born-digital paragraph generator composed with remixed typed assemblage-letters.",
-  "main": "betical.js",
+  "main": "dist/betical.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "serve": "http-server",
@@ -12,8 +12,12 @@
     "type": "git",
     "url": "git+https://github.com/jorsi/betical.git"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "art",
+    "digital poem",
+    "custom web element"
+  ],
+  "author": "Jonathon Orsi",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/jorsi/betical/issues"
