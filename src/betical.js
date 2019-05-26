@@ -1,12 +1,18 @@
 import base64Letters from './letters.js';
+import newLineSound from './assets/new-line.mp3';
+import spaceSound from './assets/type-2.mp3';
+import typeSound1 from './assets/type-1.mp3';
+import typeSound2 from './assets/type-3.mp3';
+import typeSound3 from './assets/type-4.mp3';
+import typeSound4 from './assets/type-5.mp3';
 const audioSources = {
-  newLine: './assets/new-line.mp3',
-  space: './assets/type-2.mp3',
+  newLine: newLineSound,
+  space: spaceSound,
   type: [
-    './assets/type-1.mp3',
-    './assets/type-3.mp3',
-    './assets/type-4.mp3',
-    './assets/type-5.mp3',
+    typeSound1,
+    typeSound2,
+    typeSound3,
+    typeSound4,
   ]
 };
 
