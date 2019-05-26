@@ -16,7 +16,7 @@ const audioSources = {
   ]
 };
 
-class Betical extends HTMLElement {
+export class Betical extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
