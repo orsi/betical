@@ -1,6 +1,6 @@
 {
   "name": "betical",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A born-digital paragraph generator composed with remixed typed assemblage-letters.",
   "main": "dist/betical.js",
   "module": "dist/betical.js",
