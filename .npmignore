@@ -5,3 +5,4 @@ rollup.config.js
 images
 node_modules
 tools
+public
