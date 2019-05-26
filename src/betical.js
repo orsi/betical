@@ -1,12 +1,12 @@
 import base64Letters from './letters.js';
 const audioSources = {
-  newLine: './new-line.mp3',
-  space: './type-2.mp3',
+  newLine: './assets/new-line.mp3',
+  space: './assets/type-2.mp3',
   type: [
-    './type-1.mp3',
-    './type-3.mp3',
-    './type-4.mp3',
-    './type-5.mp3',
+    './assets/type-1.mp3',
+    './assets/type-3.mp3',
+    './assets/type-4.mp3',
+    './assets/type-5.mp3',
   ]
 };
 

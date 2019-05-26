@@ -5,8 +5,8 @@
   "main": "betical.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "serve": "http-server src",
-    "build": "rollup ./src/betical.js --file ./dist/betical.js --format iife"
+    "serve": "http-server",
+    "build": "rollup -c"
   },
   "repository": {
     "type": "git",
@@ -22,6 +22,7 @@
   "devDependencies": {
     "base64-img": "^1.0.4",
     "http-server": "^0.11.1",
-    "rollup": "^1.12.3"
+    "rollup": "^1.12.3",
+    "rollup-plugin-copy-assets": "^2.0.1"
   }
 }
