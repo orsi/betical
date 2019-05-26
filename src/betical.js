@@ -5,21 +5,21 @@ import typeSound1 from './assets/type-1.mp3';
 import typeSound2 from './assets/type-3.mp3';
 import typeSound3 from './assets/type-4.mp3';
 import typeSound4 from './assets/type-5.mp3';
-const audioSources = {
-  newLine: newLineSound,
-  space: spaceSound,
-  type: [
-    typeSound1,
-    typeSound2,
-    typeSound3,
-    typeSound4,
-  ]
-};
 
 export class Betical extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
+    this.audioSources = {
+      newLine: newLineSound,
+      space: spaceSound,
+      type: [
+        typeSound1,
+        typeSound2,
+        typeSound3,
+        typeSound4,
+      ]
+    };
     this.poem = this.generatePoem(5, 15);
     this.debug = false;
     this.currentParagraphIndex = 0;
@@ -304,19 +304,19 @@ export class Betical extends HTMLElement {
 
 
   playNewLineSound() {
-    new Audio(audioSources.newLine).play();
+    new Audio(this.audioSources.newLine).play();
   }
 
   playSpaceSound() {
-    new Audio(audioSources.space).play();
+    new Audio(this.audioSources.space).play();
   }
   playTypeSound() {
-    let nextTypeSound = Math.floor(Math.random() * audioSources.type.length);
+    let nextTypeSound = Math.floor(Math.random() * this.audioSources.type.length);
     while (nextTypeSound === this.lastTypeSound) {
-      nextTypeSound = Math.floor(Math.random() * audioSources.type.length);
+      nextTypeSound = Math.floor(Math.random() * this.audioSources.type.length);
     }
     this.lastTypeSound = nextTypeSound;
-    const src = audioSources.type[nextTypeSound];
+    const src = this.audioSources.type[nextTypeSound];
     new Audio(src).play();
   }
 }
