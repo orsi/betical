@@ -78,7 +78,6 @@ export class Betical extends HTMLElement {
     <style>
     :host {
       display: block;
-      padding: 36px;
       height: 100%;
       width: 100%;
       box-sizing: border-box;
