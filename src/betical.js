@@ -35,7 +35,7 @@ class Betical extends HTMLElement {
 
   connectedCallback() {
     this.render();
-    this.title = this.shadowRoot.querySelector('#betical-title');
+    this.titleElement = this.shadowRoot.querySelector('#betical-title');
     this.hint = this.shadowRoot.querySelector('#hint');
     this.startButton = this.shadowRoot.querySelector('#betical-start');
     this.stopButton = this.shadowRoot.querySelector('#betical-stop');
