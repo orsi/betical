@@ -11,34 +11,26 @@ const audioSources = {
 };
 
 class Betical extends HTMLElement {
-  debug = false;
-  title;
-  beticalContainer;
-  startButton;
-  stopButton;
-  resetButton;
-  poem;
-  currentParagraphElement;
-  currentParagraphIndex = 0;
-  currentWordElement;
-  currentWordIndex = 0;
-  currentLetterIndex = 0;
-  running = false;
-  minLetterDelay = 200;
-  maxLetterDelay = 500;
-  lastTypeSound = -1;
-  letterWidth = 20;
-  letterHeight = 20;
-  lastFrameTime = new Date().getTime();
-  accumulator = 0;
-  fps = 60;
-  frameRate = 1000 / this.fps;
-  sinceLastUpdate = 0;
-
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
     this.poem = this.generatePoem(5, 15);
+    this.debug = false;
+    this.currentParagraphIndex = 0;
+    this.currentWordIndex = 0;
+    this.currentLetterIndex = 0;
+    this.running = false;
+    this.minLetterDelay = 200;
+    this.maxLetterDelay = 500;
+    this.lastTypeSound = -1;
+    this.letterWidth = 20;
+    this.letterHeight = 20;
+    this.lastFrameTime = new Date().getTime();
+    this.accumulator = 0;
+    this.fps = 60;
+    this.frameRate = 1000 / this.fps;
+    this.sinceLastUpdate = 0;
+    this.nextUpdateIn = 0;
   }
 
   connectedCallback() {
@@ -186,7 +178,6 @@ class Betical extends HTMLElement {
     }
   }
 
-  nextUpdateIn = 0;
   update (time) {
     this.sinceLastUpdate += time;
     let didUpdate = false;
