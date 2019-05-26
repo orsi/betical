@@ -66,7 +66,7 @@ class Betical extends HTMLElement {
         this.reset();
       });
     } else {
-      window.addEventListener('click', () => {
+      this.addEventListener('click', () => {
         if (!this.running) {
           this.start();
           this.hint.style.opacity = 0;
