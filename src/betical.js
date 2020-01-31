@@ -25,6 +25,7 @@ export class Betical extends HTMLElement {
     this.currentParagraphIndex = 0;
     this.currentWordIndex = 0;
     this.currentLetterIndex = 0;
+    this.isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     this.running = false;
     this.minLetterDelay = 200;
     this.maxLetterDelay = 500;
@@ -64,21 +65,38 @@ export class Betical extends HTMLElement {
         this.reset();
       });
     } else {
-      this.beginButton.addEventListener('click', () => {
-        this.beginButton.style.opacity = 1;
+      if (this.isMobile) {
+        this.beginButton.addEventListener('touchstart', () => {
+          this.beginButton.style.opacity = 1;
 
-        var fade = () => {
-          if ((this.beginButton.style.opacity -= .02) < 0) {
-            this.beginButton.style.display = "none";
-            this.start();
-          } else {
-            requestAnimationFrame(fade);
-          }
-        };
+          var fade = () => {
+            if ((this.beginButton.style.opacity -= .02) < 0) {
+              this.beginButton.style.display = "none";
+              this.start();
+            } else {
+              requestAnimationFrame(fade);
+            }
+          };
 
-        this.playTypeSound(); // enables mobile
-        fade();
-      });
+          this.playTypeSound();
+          fade();
+        });
+      } else {
+        this.beginButton.addEventListener('click', () => {
+          this.beginButton.style.opacity = 1;
+  
+          var fade = () => {
+            if ((this.beginButton.style.opacity -= .02) < 0) {
+              this.beginButton.style.display = "none";
+              this.start();
+            } else {
+              requestAnimationFrame(fade);
+            }
+          };
+  
+          fade();
+        });
+      }
     }
   }
 
