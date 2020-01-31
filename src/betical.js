@@ -42,7 +42,7 @@ export class Betical extends HTMLElement {
   connectedCallback() {
     this.render();
     this.titleElement = this.shadowRoot.querySelector('#betical-title');
-    this.hint = this.shadowRoot.querySelector('#hint');
+    this.beginButton = this.shadowRoot.querySelector('#begin-button');
     this.startButton = this.shadowRoot.querySelector('#betical-start');
     this.stopButton = this.shadowRoot.querySelector('#betical-stop');
     this.resetButton = this.shadowRoot.querySelector('#betical-reset');
@@ -64,11 +64,19 @@ export class Betical extends HTMLElement {
         this.reset();
       });
     } else {
-      this.addEventListener('click', () => {
-        if (!this.running) {
-          this.start();
-          this.hint.style.opacity = 0;
-        }
+      this.beginButton.addEventListener('click', () => {
+        this.beginButton.style.opacity = 1;
+
+        var fade = () => {
+          if ((this.beginButton.style.opacity -= .02) < 0) {
+            this.beginButton.style.display = "none";
+            this.start();
+          } else {
+            requestAnimationFrame(fade);
+          }
+        };
+
+        fade();
       });
     }
   }
@@ -80,20 +88,27 @@ export class Betical extends HTMLElement {
       display: block;
       height: 100%;
       width: 100%;
+      padding: 0 16px;
       box-sizing: border-box;
       background-color: #f5f5f5;
     }
-    #betical-title {
-      font-family: sans-serif;
-      font-weight: 300;
-      text-transform: uppercase;
-      color: rgba(0,0,0,.2);
+    #begin-button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: block;
+      margin: 0 auto;
+      padding: 8px 16px;
+      width: 160px;
     }
-    #hint {
-      font-size: 14px;
-      font-weight: 900;
-      margin-left: 24px;
-      transition: opacity .6s ease-in;
+    #betical-title {
+      font-family: Baskerville, serif;
+      font-weight: 300;
+      color: #444;
+      margin: 0;
+      padding: 16px 0;
+      text-align: center;
+      text-transform: uppercase;
     }
     .debug {
       ${this.debug ? 'display: block;' : 'display: none;'}
@@ -112,6 +127,8 @@ export class Betical extends HTMLElement {
       cursor: pointer;
     }
     #betical-container {
+      margin: 0 auto;
+      max-width: 600px;
     }
     .paragraph {
       position: relative;
@@ -131,8 +148,8 @@ export class Betical extends HTMLElement {
     </style>
     <h1 id="betical-title">
       Betical
-      <span id="hint">Click to start</span>
     </h1>
+    <button id="begin-button">Begin</button>
     <div class="debug">
       <button id="betical-start">Start</button>
       <button id="betical-stop">Stop</button>
