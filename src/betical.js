@@ -76,6 +76,7 @@ export class Betical extends HTMLElement {
           }
         };
 
+        this.playTypeSound(); // enables mobile
         fade();
       });
     }
@@ -326,6 +327,7 @@ export class Betical extends HTMLElement {
   playSpaceSound() {
     new Audio(this.audioSources.space).play();
   }
+
   playTypeSound() {
     let nextTypeSound = Math.floor(Math.random() * this.audioSources.type.length);
     while (nextTypeSound === this.lastTypeSound) {
@@ -335,5 +337,6 @@ export class Betical extends HTMLElement {
     const src = this.audioSources.type[nextTypeSound];
     new Audio(src).play();
   }
+
 }
 window.customElements.define('bet-ical', Betical);
