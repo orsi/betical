@@ -243,7 +243,10 @@ export class Betical extends HTMLElement {
       margin: 0;
       padding: 16px 0;
       text-align: center;
-      text-transform: uppercase;
+    }
+    #title > span {
+      display: inline-block;
+      vertical-align: top;
     }
     @keyframes 'blink' {
       from { background-color: #444; }
@@ -253,7 +256,12 @@ export class Betical extends HTMLElement {
     }
     </style>
     <h1 id="title">
-      Betical
+      ${ ['B', 'E', 'T', 'I', 'C', 'A', 'L'].map(letter => {
+        // randomization
+        const marginTop = Math.random() * 6;
+        const fontSize = (Math.random() * 6) + 24;
+        return `<span style="margin-top: ${marginTop}px; font-size: ${fontSize}px;">${letter}</span>`
+      }).join('') }
     </h1>
     <section id="betical">
       <span id="container"></span>
