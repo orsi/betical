@@ -251,6 +251,7 @@ export class Betical extends HTMLElement {
     }
     #cursor {
       animation: 1.2s blink step-end infinite;
+      -webkit-animation: 1.2s blink step-end infinite;
       background-color: #444;
       cursor: text;
       display: inline-block;
@@ -286,6 +287,12 @@ export class Betical extends HTMLElement {
       vertical-align: top;
     }
     @keyframes 'blink' {
+      from { background-color: #444; }
+      49% { background-color: #444; }
+      50% { background-color: transparent; }
+      to { background-color: transparent; }
+    }
+    @-webkit-keyframes 'blink' {
       from { background-color: #444; }
       49% { background-color: #444; }
       50% { background-color: transparent; }
