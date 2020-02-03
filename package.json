@@ -1,5 +1,5 @@
 {
-  "name": "betical",
+  "name": "@orsi/betical",
   "version": "2.0.0",
   "description": "A born-digital paragraph generator composed with remixed typed assemblage-letters.",
   "main": "dist/betical.js",
