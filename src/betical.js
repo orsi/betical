@@ -20,7 +20,7 @@ export class Betical extends HTMLElement {
         typeSound4,
       ]
     };
-    this.poem = this.generatePoem(5, 15);
+    this.poem = this.generatePoem(1, 1);
     this.currentIndex = 0;
     this.isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     this.isRunning = false;
@@ -148,6 +148,11 @@ export class Betical extends HTMLElement {
       this.stop();
     }
 
+    if (this.currentIndex >= this.poem.length) {
+      // no more poem
+      return;
+    }
+    
     switch (this.poem[this.currentIndex]) {
       case ' ':
         // space
