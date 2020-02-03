@@ -20,7 +20,7 @@ export class Betical extends HTMLElement {
         typeSound4,
       ]
     };
-    this.poem = this.generatePoem(1, 1);
+    this.poem = this.generatePoem(2, 10);
     this.currentIndex = 0;
     this.isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     this.isRunning = false;
@@ -310,7 +310,7 @@ export class Betical extends HTMLElement {
     this.currentIndex = 0;
     this.nextUpdateIn = 0;
     this.container.innerHTML = '';
-    this.poem = this.generatePoem(5, 15);
+    this.poem = this.generatePoem(2, 10);
   }
 
   run() {
