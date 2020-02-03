@@ -152,7 +152,7 @@ export class Betical extends HTMLElement {
       // no more poem
       return;
     }
-    
+
     switch (this.poem[this.currentIndex]) {
       case ' ':
         // space
@@ -212,12 +212,12 @@ export class Betical extends HTMLElement {
     this.shadowRoot.innerHTML = `
     <style>
     :host {
-      display: block;
-      height: 100%;
-      width: 100%;
-      padding: 0 16px;
-      box-sizing: border-box;
       background-color: #f5f5f5;
+      box-sizing: border-box;
+      display: block;
+      min-height: 100%;
+      padding: 0 16px;
+      width: 100%;
     }
     #betical {
       position: relative;
