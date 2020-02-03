@@ -121,6 +121,7 @@ export class Betical extends HTMLElement {
 
   init() {
     this.container = this.shadowRoot.querySelector('#container');
+    this.hint = this.shadowRoot.querySelector('#hint');
 
     // attach events
     document.addEventListener('keydown', (e) => {
@@ -130,9 +131,13 @@ export class Betical extends HTMLElement {
       this.onKeypress(e);
     });
 
-    // touching on mobile starts/stops
     if (this.isMobile) {
+
+      // touching on mobile starts/stops
       this.addEventListener('touchstart', () => {
+        // make sure hint is gone
+        this.hideHint();
+
         if (this.isRunning) {
           this.stop();
         } else {
@@ -140,9 +145,21 @@ export class Betical extends HTMLElement {
           this.start();
         }
       });
+
+      // hint
+      this.hint.textContent = 'Touch';
+    } else {
+      // hint
+      this.hint.textContent = 'Type...';
     }
   }
-  
+
+  hideHint() {
+    if (this.hint.style.opacity !== 0) {
+      this.hint.style.opacity = '0';
+    }
+  }
+
   onKeypress(e) {
     if (this.isRunning) {
       this.stop();
@@ -152,6 +169,9 @@ export class Betical extends HTMLElement {
       // no more poem
       return;
     }
+
+    // make sure hint is gone
+    this.hideHint();
 
     switch (this.poem[this.currentIndex]) {
       case ' ':
@@ -236,6 +256,21 @@ export class Betical extends HTMLElement {
       vertical-align: top;
       width: 10px;
     }
+    #hint {
+      top: 50%;
+      color: rgba(0,0,0,.1);
+      font-family: monospace;
+      font-size: 36px;
+      left: 50%;
+      margin: 16px auto;
+      pointer-events: none;
+      position: fixed;
+      text-align: center;
+      text-transform: uppercase;
+      transform: translate(-50%, -50%);
+      transition: opacity 2s ease-out;
+      width: 100%;
+    }
     #title {
       font-family: Baskerville, serif;
       font-weight: 300;
@@ -267,6 +302,7 @@ export class Betical extends HTMLElement {
       <span id="container"></span>
       <span id="cursor"></span>
     </section>
+    <div id="hint"></div>
   `;
   }
 
