@@ -67,7 +67,6 @@ export class Betical extends HTMLElement {
     // randomize styles
     const opacity = Math.random() * .4 + .6;
     const top = Math.random() * 4;
-    imgElement.style.display = `inline-block`;
     imgElement.style.width = `${this.letterWidth}px`;
     imgElement.style.height = `${this.letterHeight}px`;
     imgElement.style.opacity = `${opacity}`
@@ -246,6 +245,9 @@ export class Betical extends HTMLElement {
     }
     #container {
       vertical-align: top;
+    }
+    #container >  * {
+      position: relative;
     }
     #cursor {
       animation: 1.2s blink step-end infinite;
