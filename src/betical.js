@@ -37,44 +37,6 @@ export class Betical extends HTMLElement {
     this.nextUpdateIn = 0;
   }
 
-  insertParagraphBreak() {
-    const breakSpanElement = document.createElement('div');
-    breakSpanElement.className = 'paragraph-break;'
-
-    // random margin
-    const marginTop = Math.random() * 24 + 12;
-    breakSpanElement.style.marginTop = `${marginTop}px`
-    
-    this.container.append(breakSpanElement);
-  }
-
-  insertSpace() {
-    const spaceElement = document.createElement('span');
-    spaceElement.className = 'space';
-
-    // randomize styles
-    const marginRight = Math.random() * 12 + 10;
-    spaceElement.style.marginRight = `${marginRight}px`
-
-    this.container.append(spaceElement);
-  }
-
-  insertLetter(letter) {
-    const imgElement = document.createElement('img');
-    imgElement.className = 'letter';
-    imgElement.src = base64Letters[letter];
-
-    // randomize styles
-    const opacity = Math.random() * .4 + .6;
-    const top = Math.random() * 4;
-    imgElement.style.width = `${this.letterWidth}px`;
-    imgElement.style.height = `${this.letterHeight}px`;
-    imgElement.style.opacity = `${opacity}`
-    imgElement.style.top = `${top}px`;
-
-    this.container.append(imgElement);
-  }
-
   connectedCallback() {
     this.render();
     this.init();
@@ -118,6 +80,12 @@ export class Betical extends HTMLElement {
     return word;
   }
 
+  hideHint() {
+    if (this.hint.style.opacity !== 0) {
+      this.hint.style.opacity = '0';
+    }
+  }
+
   init() {
     this.container = this.shadowRoot.querySelector('#container');
     this.hint = this.shadowRoot.querySelector('#hint');
@@ -153,10 +121,45 @@ export class Betical extends HTMLElement {
     }
   }
 
-  hideHint() {
-    if (this.hint.style.opacity !== 0) {
-      this.hint.style.opacity = '0';
-    }
+  insertParagraphBreak() {
+    const breakSpanElement = document.createElement('div');
+    breakSpanElement.className = 'paragraph-break;'
+
+    // random margin
+    const marginTop = Math.random() * 24 + 12;
+    breakSpanElement.style.marginTop = `${marginTop}px`
+    
+    this.container.append(breakSpanElement);
+  }
+
+  insertSpace() {
+    const spaceElement = document.createElement('span');
+    spaceElement.className = 'space';
+
+    // randomize styles
+    const marginRight = Math.random() * 12 + 10;
+    spaceElement.style.marginRight = `${marginRight}px`
+
+    this.container.append(spaceElement);
+  }
+
+  insertLetter(letter) {
+    const imgElement = document.createElement('img');
+    imgElement.className = 'letter';
+    imgElement.src = base64Letters[letter];
+
+    // randomize styles
+    const opacity = Math.random() * .4 + .6;
+    const top = Math.random() * 4;
+    imgElement.style.width = `${this.letterWidth}px`;
+    imgElement.style.height = `${this.letterHeight}px`;
+    imgElement.style.opacity = `${opacity}`
+    imgElement.style.top = `${top}px`;
+
+    this.container.append(imgElement);
+
+    // scroll window to bottom to avoid going out of view
+    this.scrollToBottom();
   }
 
   onKeypress(e) {
@@ -336,6 +339,14 @@ export class Betical extends HTMLElement {
     if (this.isRunning) {
       requestAnimationFrame(() => this.run());
     }
+  }
+
+  scrollToBottom() {
+    var scrollingElement = document.scrollingElement || document.body;
+    window.scrollTo({
+      top: scrollingElement.scrollHeight,
+      behavior: 'smooth'
+    });
   }
 
   start() {
