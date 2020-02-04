@@ -30,6 +30,10 @@ export class Betical extends HTMLElement {
     this.letterHeight = 20;
     this.minLetterDelay = 200;
     this.maxLetterDelay = 500;
+    this.minSpaceDelay = 500;
+    this.maxSpaceDelay = 1600;
+    this.minParagraphDelay = 2000;
+    this.maxParagraphDelay = 3000;
     this.accumulator = 0;
     this.fps = 60;
     this.frameRate = 1000 / this.fps;
@@ -367,38 +371,39 @@ export class Betical extends HTMLElement {
     let didUpdate = false;
 
     if (this.sinceLastUpdate >= this.nextUpdateIn) {
-      if (this.currentIndex >= this.poem.length) {
-        // end of poem
-        this.stop();
-        this.playNewLineSound();
-      } else {
+      if (this.currentIndex < this.poem.length) {
         switch (this.poem[this.currentIndex]) {
           case ' ':
             // space
-            didUpdate = true;
             this.insertSpace();
             this.playSpaceSound();
+
+            this.nextUpdateIn = Math.random() * (this.maxSpaceDelay - this.minSpaceDelay) + this.minSpaceDelay;
+            this.sinceLastUpdate = 0;
             break;
           case '\r':
             // new paragraph
-            didUpdate = true;
             this.insertParagraphBreak();
             this.playNewLineSound();
+
+            this.nextUpdateIn = Math.random() * (this.maxParagraphDelay - this.minParagraphDelay) + this.minParagraphDelay;
+            this.sinceLastUpdate = 0;
             break;
           default:
             // letter
-            didUpdate = true;
             this.insertLetter(this.poem[this.currentIndex]);
             this.playTypeSound();
+
+            this.nextUpdateIn = Math.random() * (this.maxLetterDelay - this.minLetterDelay) + this.minLetterDelay;
+            this.sinceLastUpdate = 0;
             break;
         }
         this.currentIndex++;
-      }
 
-      if (didUpdate) {
-          // figure out next update
-          this.nextUpdateIn = Math.random() * (this.maxLetterDelay - this.minLetterDelay) + this.minLetterDelay;
-          this.sinceLastUpdate = 0;
+      } else {
+        // end of poem
+        this.stop();
+        this.playNewLineSound();
       }
     }
   }
