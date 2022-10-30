@@ -1,10 +1,10 @@
-import base64Letters from './letters.js';
-import newLineSound from './new-line.mp3';
-import spaceSound from './type-2.mp3';
-import typeSound1 from './type-1.mp3';
-import typeSound2 from './type-3.mp3';
-import typeSound3 from './type-4.mp3';
-import typeSound4 from './type-5.mp3';
+import letters from './letters.js';
+import newLineSound from './assets/new-line.mp3';
+import spaceSound from './assets/type-2.mp3';
+import typeSound1 from './assets/type-1.mp3';
+import typeSound2 from './assets/type-3.mp3';
+import typeSound3 from './assets/type-4.mp3';
+import typeSound4 from './assets/type-5.mp3';
 
 export class Betical extends HTMLElement {
   constructor() {
@@ -20,68 +20,35 @@ export class Betical extends HTMLElement {
         typeSound4,
       ]
     };
-    this.poem = this.generatePoem(2, 10);
-    this.currentIndex = 0;
     this.isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    this.isRunning = false;
-    this.lastFrameTime = new Date().getTime();
     this.lastTypeSound = -1;
     this.letterWidth = 20;
     this.letterHeight = 20;
-    this.minLetterDelay = 200;
-    this.maxLetterDelay = 500;
-    this.minSpaceDelay = 500;
-    this.maxSpaceDelay = 1600;
-    this.minParagraphDelay = 2000;
-    this.maxParagraphDelay = 3000;
-    this.accumulator = 0;
-    this.fps = 60;
-    this.frameRate = 1000 / this.fps;
-    this.sinceLastUpdate = 0;
-    this.nextUpdateIn = 0;
   }
 
   connectedCallback() {
     this.render();
-    this.init();
-  }
 
-  generatePoem(min, max) {
-    let poem = [];
-    // calculates a random amount of paragraphs between min and max
-    var length = Math.floor(Math.random() * (max - min)) + min;
-    for (var i = 0; i < length; i++) {
-      var paragraph = this.generateParagraph(5, 20);
-      poem = poem.concat(paragraph);
-      if (i !== length -1) {
-        poem.push('\r');
-      }
-    }
-    return poem;
-  }
+    this.container = this.shadowRoot.querySelector('#container');
+    this.hint = this.shadowRoot.querySelector('#hint');
+    this.input = this.shadowRoot.querySelector('#input');
 
-  generateParagraph(min, max) {
-    let paragraph = [];
-    // calculates a random amount of words between min and max
-    var length = Math.floor(Math.random() * (max - min)) + min;
-    for (var i = 0; i < length; i++) {
-      var words = this.generateWord(2, 12);
-      paragraph = paragraph.concat(words);
-      if (i !== length -1) {
-        paragraph.push(' ');
-      }
-    }
-    return paragraph;
-  }
+    if (this.isMobile) {
+      // give hint to user to touch screen first to focus input
+      this.hint.textContent = 'Touch...';
+      // if mobile, focus input to show keyboard
+      window.addEventListener('touchstart', () => {
+        if (this.input && this.input !== document.activeElement) {
+          this.input.focus();
+        }
+      });
 
-  generateWord(min, max) {
-    var word = [];
-    var length = Math.floor(Math.random() * (max - min)) + min;
-    for (var i = 0; i < length; i++) {
-      var letterIndex = Math.floor(Math.random() * base64Letters.length);
-      word.push(letterIndex);
     }
-    return word;
+
+    // attach events
+    document.addEventListener('keydown', (e) => {
+      this.onKeydown(e);
+    });
   }
 
   hideHint() {
@@ -90,49 +57,14 @@ export class Betical extends HTMLElement {
     }
   }
 
-  init() {
-    this.container = this.shadowRoot.querySelector('#container');
-    this.hint = this.shadowRoot.querySelector('#hint');
-
-    // attach events
-    document.addEventListener('keydown', (e) => {
-      this.onKeydown(e);
-    });
-    document.addEventListener('keypress', (e) => {
-      this.onKeypress(e);
-    });
-
-    if (this.isMobile) {
-
-      // touching on mobile starts/stops
-      this.addEventListener('touchstart', () => {
-        // make sure hint is gone
-        this.hideHint();
-
-        if (this.isRunning) {
-          this.stop();
-        } else {
-          this.playTypeSound();
-          this.start();
-        }
-      });
-
-      // hint
-      this.hint.textContent = 'Touch';
-    } else {
-      // hint
-      this.hint.textContent = 'Type...';
-    }
-  }
-
   insertParagraphBreak() {
     const breakSpanElement = document.createElement('div');
     breakSpanElement.className = 'paragraph-break;'
 
-    // random margin
-    const marginTop = Math.random() * 24 + 12;
-    breakSpanElement.style.marginTop = `${marginTop}px`
-    
+    // random spacing
+    const paddingTop = Math.random() * 24 + 12;
+    breakSpanElement.style.paddingTop = `${paddingTop}px`
+
     this.container.append(breakSpanElement);
   }
 
@@ -150,7 +82,7 @@ export class Betical extends HTMLElement {
   insertLetter(letter) {
     const imgElement = document.createElement('img');
     imgElement.className = 'letter';
-    imgElement.src = base64Letters[letter];
+    imgElement.src = letters[letter];
 
     // randomize styles
     const opacity = Math.random() * .4 + .6;
@@ -161,59 +93,56 @@ export class Betical extends HTMLElement {
     imgElement.style.top = `${top}px`;
 
     this.container.append(imgElement);
-
-    // scroll window to bottom to avoid going out of view
-    this.scrollToBottom();
   }
 
-  onKeypress(e) {
+  onKeydown(e) {
+    // stops autoplay for mobile
     if (this.isRunning) {
       this.stop();
     }
 
-    if (this.currentIndex >= this.poem.length) {
-      // no more poem
+    // ignore any non-alphanumeric keys
+    const keyCode = e.keyCode || e.which;
+    const isAlphaNumericKey = (keyCode >= 48 && keyCode <= 57) || (keyCode >= 65 && keyCode <= 90);
+    const isSpace = e.key === ' ';
+    const isEnter = e.key === 'Enter';
+    const isEscape = e.key === 'Escape';
+    const isBackspace = e.key === 'Backspace';
+    if (!isAlphaNumericKey && !isSpace && !isEnter && !isEscape && !isBackspace) {
       return;
     }
 
     // make sure hint is gone
     this.hideHint();
 
-    switch (this.poem[this.currentIndex]) {
-      case ' ':
-        // space
-        this.insertSpace();
-        this.playSpaceSound();
+    switch (e.key) {
+      case 'Backspace':
+        this.removeLastLetter();
+        this.playTypeSound();
         break;
-      case '\r':
-        // new paragraph
+      case 'Enter':
         this.insertParagraphBreak();
         this.playNewLineSound();
         break;
-      default:
-        // letter
-        this.insertLetter(this.poem[this.currentIndex]);
-        this.playTypeSound();
-        break;
-    }
-    this.currentIndex++;
-  }
-
-  onKeydown(e) {
-    switch(e.key) {
-      case 'Enter':
-        // this.start();
-        break;
       case 'Escape':
         this.stop();
-        setTimeout(() => this.reset(), 200); // needs time for update to stop
+        setTimeout(() => {
+          this.container.innerHTML = '';
+        }, 200); // needs time for update to stop
         this.playNewLineSound();
         break;
       case ' ':
+        this.insertSpace();
+        this.playSpaceSound();
         break;
       default:
+        this.insertLetter(Math.floor(Math.random() * letters.length));
+        this.playTypeSound();
         break;
     }
+
+    // scroll window to bottom to avoid going out of view
+    this.scrollToBottom();
   }
 
   playNewLineSound() {
@@ -232,6 +161,10 @@ export class Betical extends HTMLElement {
     this.lastTypeSound = nextTypeSound;
     const src = this.audioSources.type[nextTypeSound];
     new Audio(src).play();
+  }
+
+  removeLastLetter() {
+    this.container.lastChild.remove();
   }
 
   render() {
@@ -267,19 +200,16 @@ export class Betical extends HTMLElement {
       width: 10px;
     }
     #hint {
-      top: 50%;
       color: rgba(0,0,0,.1);
       font-family: monospace;
-      font-size: 36px;
-      left: 50%;
-      margin: 16px auto;
+      font-size: 20px;
+      left: 20px;
+      line-height: 1;
       pointer-events: none;
-      position: fixed;
+      position: absolute;
       text-align: center;
       text-transform: uppercase;
-      transform: translate(-50%, -50%);
-      transition: opacity 2s ease-out;
-      width: 100%;
+      top: 0;
     }
     #title {
       font-family: Baskerville, serif;
@@ -292,6 +222,11 @@ export class Betical extends HTMLElement {
     #title > span {
       display: inline-block;
       vertical-align: top;
+    }
+    #input {
+      // display: none;
+      font-size: 16px;
+      opacity: 0;
     }
     @keyframes 'blink' {
       from { background-color: #444; }
@@ -307,108 +242,29 @@ export class Betical extends HTMLElement {
     }
     </style>
     <h1 id="title">
-      ${ ['B', 'E', 'T', 'I', 'C', 'A', 'L'].map(letter => {
-        // randomization
-        const marginTop = Math.random() * 6;
-        const fontSize = (Math.random() * 6) + 24;
-        return `<span style="margin-top: ${marginTop}px; font-size: ${fontSize}px;">${letter}</span>`
-      }).join('') }
+      ${['B', 'E', 'T', 'I', 'C', 'A', 'L'].map(letter => {
+      // randomization
+      const marginTop = Math.random() * 6;
+      const fontSize = (Math.random() * 6) + 24;
+      return `<span style="margin-top: ${marginTop}px; font-size: ${fontSize}px;">${letter}</span>`
+    }).join('')}
     </h1>
     <section id="betical">
       <span id="container"></span>
       <span id="cursor"></span>
+      <span id="hint">Type...</span>
+      <input id="input" type="text" />
     </section>
-    <div id="hint"></div>
   `;
   }
 
-  reset() {
-    this.currentIndex = 0;
-    this.nextUpdateIn = 0;
-    this.container.innerHTML = '';
-    this.poem = this.generatePoem(2, 10);
-  }
-
-  run() {
-    const now = new Date().getTime();
-    const delta = now - this.lastFrameTime;
-    this.lastFrameTime = now;
-
-    this.accumulator += delta;
-    while (this.accumulator >= this.frameRate) {
-      this.update(this.frameRate);
-      this.accumulator -= this.frameRate;
-    }
-
-    if (this.isRunning) {
-      requestAnimationFrame(() => this.run());
-    }
-  }
-
   scrollToBottom() {
-    var scrollingElement = document.scrollingElement || document.body;
+    const scrollingElement = document.scrollingElement || document.body;
+    const windowHeight = window.innerHeight;
     window.scrollTo({
-      top: scrollingElement.scrollHeight,
+      top: scrollingElement.scrollHeight - windowHeight,
       behavior: 'smooth'
     });
   }
-
-  start() {
-    this.isRunning = true;
-
-    // reset last update to avoid catch up on resume
-    this.lastFrameTime = new Date().getTime();
-
-    this.run();
-  }
-
-  stop() {
-    this.isRunning = false;
-  }
-
-  update (time) {
-    this.sinceLastUpdate += time;
-    let didUpdate = false;
-
-    if (this.sinceLastUpdate >= this.nextUpdateIn) {
-      if (this.currentIndex < this.poem.length) {
-        switch (this.poem[this.currentIndex]) {
-          case ' ':
-            // space
-            this.insertSpace();
-            this.playSpaceSound();
-
-            this.nextUpdateIn = Math.random() * (this.maxSpaceDelay - this.minSpaceDelay) + this.minSpaceDelay;
-            this.sinceLastUpdate = 0;
-            break;
-          case '\r':
-            // new paragraph
-            this.insertParagraphBreak();
-            this.playNewLineSound();
-
-            this.nextUpdateIn = Math.random() * (this.maxParagraphDelay - this.minParagraphDelay) + this.minParagraphDelay;
-            this.sinceLastUpdate = 0;
-            break;
-          default:
-            // letter
-            this.insertLetter(this.poem[this.currentIndex]);
-            this.playTypeSound();
-
-            this.nextUpdateIn = Math.random() * (this.maxLetterDelay - this.minLetterDelay) + this.minLetterDelay;
-            this.sinceLastUpdate = 0;
-            break;
-        }
-        this.currentIndex++;
-
-      } else {
-        // end of poem
-        this.stop();
-        this.playNewLineSound();
-      }
-    }
-  }
-
-
-
 }
 window.customElements.define('bet-ical', Betical);

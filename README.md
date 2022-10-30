@@ -4,6 +4,20 @@
 
 A born-digital paragraph generator composed with remixed typed assemblage-letters.  
 
+## Setup
+
+```bash
+~$ git clone git@github.com:orsi/betical.git
+~$ cd betical
+~/betical$ npm ci
+~/betical$ npm start
+```
+
+## Build
+```bash
+~/betical$ npm run build
+```
+
 ## About
 
 Quote from [Screening(s)](http://screencanadianelit.ca):
